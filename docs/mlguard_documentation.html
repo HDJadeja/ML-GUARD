@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MLGuard Library Documentation</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f9fafb;
+      color: #1f2937;
+    }
+    header {
+      background-color: #0f172a;
+      color: #fff;
+      padding: 2rem;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.2rem;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    section {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    h2 {
+      color: #0f172a;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 0.5rem;
+    }
+    h3 {
+      margin-top: 1.5rem;
+      color: #334155;
+    }
+    code {
+      background: #f3f4f6;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+    }
+    pre {
+      background: #f3f4f6;
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>MLGuard: Model Diagnostic Tool </h1>
+    <p> Analyze model issues with a single line of code </p>
+  </header>
+
+  <div class="container">
+
+    <section>
+      <h2>Why MLGuard?</h2>
+      <p>MLGuard is a diagnostic toolkit for machine learning practitioners. It provides automated analysis of critical issues such as multicollinearity, class imbalance, overfitting, and fairness bias—common pitfalls that often silently degrade model performance.</p>
+      <p><strong>Use MLGuard when you need:</strong></p>
+      <ul>
+        <li>Automated sanity checks before deploying a model</li>
+        <li>Human-readable summaries of data/model quality</li>
+        <li>Direct labels like "Overfitting" or "Bias Detected" instead of interpreting raw scores or plots</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Installation</h2>
+      <p>Install the MLGuard library using pip:</p>
+      <pre><code>pip install mlguard</code></pre>
+
+      <p>Then import the checkers you need:</p>
+      <pre><code>from mlguard.multicollinearitychecker import MulticollinearityChecker
+from mlguard.class_imbalance import ClassImbalanceChecker
+from mlguard.overfitting import OverfittingChecker
+from mlguard.bias_detecter import BiasDetectionChecker
+</code></pre>
+    </section>
+
+    <section>
+      <h2>MulticollinearityChecker</h2>
+      <p>Detects multicollinearity among numeric features using Variance Inflation Factor (VIF).</p>
+
+      <h3>Method</h3>
+      <code>MulticollinearityChecker.check_vif(X, vif_threshold=5.0)</code>
+
+      <h3>Parameters</h3>
+      <ul>
+        <li><strong>X</strong> (<code>DataFrame</code> or <code>ndarray</code>): Numeric feature matrix</li>
+        <li><strong>vif_threshold</strong> (<code>float</code>): Threshold above which features are considered collinear (default=5.0)</li>
+      </ul>
+
+      <h3>Returns</h3>
+      <pre><code>{
+  "vif_scores": dict,
+  "high_vif_features": list,
+  "vif_threshold": float,
+  "collinearity_status": str
+}</code></pre>
+    </section>
+
+    <section>
+      <h2>ClassImbalanceChecker</h2>
+      <p>Evaluates label distribution and identifies imbalance issues in classification datasets.</p>
+
+      <h3>Method</h3>
+      <code>ClassImbalanceChecker.check_class_distribution(y, imbalance_threshold=0.2, plot=True)</code>
+
+      <h3>Parameters</h3>
+      <ul>
+        <li><strong>y</strong> (array-like): Target array</li>
+        <li><strong>imbalance_threshold</strong> (<code>float</code>): Max allowed class frequency gap (default=0.2)</li>
+        <li><strong>plot</strong> (<code>bool</code>): Show distribution chart (default=True)</li>
+      </ul>
+
+      <h3>Returns</h3>
+      <pre><code>{
+  "class_counts": dict,
+  "class_frequencies": dict,
+  "imbalance_ratio": float,
+  "imbalance_threshold": float,
+  "imbalance_status": str
+}</code></pre>
+    </section>
+
+    <section>
+      <h2>OverfittingChecker</h2>
+      <p><strong> Direct output of "fit_status" (e.g., "Overfitting") makes this ideal for automation. </strong></p>
+      <p>Analyzes learning curves and returns programmatic status based on performance trends.</p>
+
+      <h3>Method</h3>
+      <code>OverfittingChecker.check_learning_curve(model, X, y, cv=5, scoring=None, plot=True)</code>
+
+      <h3>Parameters</h3>
+      <ul>
+        <li><strong>model</strong>: Scikit-learn compatible model</li>
+        <li><strong>X</strong>, <strong>y</strong>: Features and labels</li>
+        <li><strong>cv</strong>: Number of cross-validation splits (default=5)</li>
+        <li><strong>scoring</strong>: Metric like 'accuracy', 'r2' etc. (default=None, auto-selected)</li>
+        <li><strong>plot</strong>: Show learning curve plot (default=True)</li>
+      </ul>
+
+      <h3>Returns</h3>
+      <pre><code>{
+  "train_sizes": list,
+  "train_scores_mean": list,
+  "test_scores_mean": list,
+  "final_train_score": float,
+  "final_test_score": float,
+  "train_test_gap": float,
+  "fit_status": str,  // "Overfitting Detected", "Underfitting Detected", or "Good Fit"
+  "scoring_metric": str
+}</code></pre>
+
+      <h3>Example</h3>
+      <pre><code>
+from mlguard.overfitting import OverfittingChecker
+from sklearn.linear_model import LogisticRegression
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+
+X, y = make_classification(n_samples=1000, n_features=10, n_informative=5, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+model = LogisticRegression(C=1000, max_iter=1000)
+result = OverfittingChecker.check_learning_curve(model, X_train, y_train, scoring='accuracy', plot=False)
+
+print("Model Fit Status:", result['fit_status'])
+print("Train Score:", result['final_train_score'])
+print("Test Score:", result['final_test_score'])
+print("Gap:", result['train_test_gap'])
+      </code></pre>
+    </section>
+
+    <section>
+      <h2>BiasDetectionChecker</h2>
+      <p>Detects performance bias across values in a sensitive feature (e.g. gender).</p>
+
+      <h3>Method</h3>
+      <code>BiasDetectionChecker.check_group_bias(model, X, y, sensitive_feature, metric='accuracy', threshold=0.1)</code>
+
+      <h3>Parameters</h3>
+      <ul>
+        <li><strong>model</strong>: Trained classification model</li>
+        <li><strong>X</strong>: Feature data (must include the sensitive column)</li>
+        <li><strong>y</strong>: Target labels</li>
+        <li><strong>sensitive_feature</strong>: Column name (or index) to group on</li>
+        <li><strong>metric</strong>: Supported: 'accuracy'</li>
+        <li><strong>threshold</strong>: Max acceptable performance gap (default=0.1)</li>
+      </ul>
+
+      <h3>Returns</h3>
+      <pre><code>{
+  "group_performance": dict,
+  "bias_gap": float,
+  "bias_threshold": float,
+  "bias_status": str,
+  "metric_used": str
+}</code></pre>
+    </section>
+
+  </div>
+
+  <footer>
+    MLGuard Library &copy; 2025 | Created by <strong>JADEJA HETRAJ</strong>
+  </footer>
+</body>
+</html>
