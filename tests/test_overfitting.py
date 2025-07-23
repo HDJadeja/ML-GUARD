@@ -19,6 +19,7 @@ def test_overfitting_detection():
     assert 'fit_status' in result
     assert result['fit_status'] in ['Overfitting Detected', 'Good Fit', 'Underfitting Detected']
 
+test_overfitting_detection()
 
 def test_underfitting_detection():
     X, y = make_classification(n_samples=200, n_features=10, random_state=42)
@@ -35,6 +36,7 @@ def test_underfitting_detection():
     assert 'fit_status' in result
     assert result['fit_status'] in ['Underfitting Detected', 'Good Fit', 'Overfitting Detected']
 
+test_underfitting_detection()
 
 def test_regression_model_support():
     X, y = make_regression(n_samples=200, n_features=10, noise=5.0, random_state=42)
@@ -50,6 +52,7 @@ def test_regression_model_support():
     assert 'fit_status' in result
     assert result['fit_status'] in ['Overfitting Detected', 'Underfitting Detected', 'Good Fit']
 
+test_regression_model_support()
 
 def test_non_fitted_model_error():
     X, y = make_classification(n_samples=100, n_features=5, random_state=42)
@@ -61,6 +64,7 @@ def test_non_fitted_model_error():
         assert isinstance(e, ValueError)
         assert "model is not fitted yet" in str(e)
 
+test_non_fitted_model_error()
 
 def test_invalid_model_type():
     class DummyModel:
@@ -74,3 +78,6 @@ def test_invalid_model_type():
         OverfittingChecker.check_learning_curve(dummy_model, X, y, plot=False)
     except Exception as e:
         assert isinstance(e, TypeError)
+
+
+test_invalid_model_type()

@@ -1,5 +1,6 @@
 import pandas as pd
 from mlguard.multicollinearitychecker import MulticollinearityChecker
+import numpy as np 
 
 def test_high_multicollinearity_detection():
     #  two collinear features
@@ -19,20 +20,27 @@ def test_high_multicollinearity_detection():
     assert any(v > 5.0 for v in result['vif_scores'].values())
 
 
+
+test_high_multicollinearity_detection()
+
 def test_no_multicollinearity_detection():
-    # with low correlation
+    np.random.seed(42)
+    # Random independent features (uncorrelated)
     X = pd.DataFrame({
-        'feature1': [1, 2, 3, 4, 5],
-        'feature2': [5, 3, 1, 4, 2],
-        'feature3': [2, 3, 2, 3, 2]
+        "A": np.random.rand(100),
+        "B": np.random.rand(100),
+        "C": np.random.rand(100)
     })
 
-    result = MulticollinearityChecker.check_vif(X, vif_threshold=10.0)  #  high threshold
+    result = MulticollinearityChecker.check_vif(X)
+
+    print("VIF TEST RESULT:", result)
 
     assert isinstance(result, dict)
     assert result['collinearity_status'] == "No Significant Multicollinearity"
-    assert len(result['high_vif_features']) == 0
+    assert all(vif < 5 for vif in result['vif_scores'].values())
 
+test_no_multicollinearity_detection()
 
 def test_invalid_input_type():
     # a non dataFrame, non ndarray input
@@ -42,6 +50,8 @@ def test_invalid_input_type():
         assert isinstance(e, TypeError)
 
 
+test_invalid_input_type()
+
 def test_too_few_features():
     # less than 2 data
     X = pd.DataFrame({'feature1': [1, 2, 3, 4, 5]})
@@ -49,3 +59,6 @@ def test_too_few_features():
         MulticollinearityChecker.check_vif(X)
     except Exception as e:
         assert isinstance(e, ValueError)
+
+
+test_too_few_features()

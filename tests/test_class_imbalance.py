@@ -27,3 +27,6 @@ def test_invalid_target_type():
         ClassImbalanceChecker.check_class_distribution(y, plot=False)
     except Exception as e:
         assert isinstance(e, TypeError) or isinstance(e, ValueError)
+
+
+test_invalid_target_type()

@@ -42,14 +42,16 @@ class BiasDetectionChecker:
             if sensitive_feature not in X.columns:
                 raise ValueError(f"Sensitive feature '{sensitive_feature}' not found in DataFrame columns.")
             sensitive_values = X[sensitive_feature].values
+            X_wo_sensitive = X.drop(columns=[sensitive_feature])
         else:
             sensitive_values = X[:, sensitive_feature]
+            X_wo_sensitive = np.delete(X, sensitive_feature, axis=1)
 
         unique_groups = np.unique(sensitive_values)
         group_performance = {}
 
         # evaluate model accuracy for each group
-        y_pred = model.predict(X)
+        y_pred = model.predict(X_wo_sensitive)
 
         for group in unique_groups:
             group_mask = sensitive_values == group
